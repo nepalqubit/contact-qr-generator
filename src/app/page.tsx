@@ -427,7 +427,7 @@ export default function Home() {
                 </div>
                 <h3 className="text-2xl font-semibold text-gray-600 mb-4">Ready to Generate!</h3>
                 <p className="text-gray-500 text-lg leading-relaxed">
-                  Fill out the form and click <span className="font-semibold text-blue-600">"Generate QR Code"</span> to create your personalized contact QR code
+                  Fill out the form and click <span className="font-semibold text-blue-600">&quot;Generate QR Code&quot;</span> to create your personalized contact QR code
                 </p>
               </div>
             )}
