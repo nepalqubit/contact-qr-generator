@@ -361,7 +361,7 @@ export default function ContactQRGenerator() {
                   <div className="w-16 h-16 mx-auto mb-4 bg-gray-200 rounded-full flex items-center justify-center">
                     <User size={32} className="text-gray-400" />
                   </div>
-                  <p className="text-gray-500">Fill out the form and click "Generate QR Code" to see your QR code here</p>
+                  <p className="text-gray-500">Fill out the form and click &quot;Generate QR Code&quot; to see your QR code here</p>
                 </div>
               </div>
             )}
