@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { QRCodeSVG } from 'qrcode.react';
-import { Download, User, Mail, Phone, Building, Globe, Linkedin, Instagram, Facebook, QrCode, ChevronDown } from 'lucide-react';
+import { Download, User, Mail, Phone, Building, Globe, Linkedin, Instagram, Facebook, ChevronDown } from 'lucide-react';
 
 // Add Poppins font
 if (typeof document !== 'undefined') {
@@ -413,7 +413,7 @@ export default function Home() {
           <div className="mt-8 p-8 rounded-lg text-center" style={{
             border: '2px dashed #6a00f4'
           }}>
-            <p className="text-gray-500">Fill out the form and click "Generate QR Code" to see your QR code here</p>
+            <p className="text-gray-500">Fill out the form and click &quot;Generate QR Code&quot; to see your QR code here</p>
           </div>
         )}
         
