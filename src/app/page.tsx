@@ -3,17 +3,24 @@
 import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { QRCodeSVG } from 'qrcode.react';
-import { Download, User, Mail, Phone, Building, Globe, Linkedin, Instagram, Facebook, QrCode, Sparkles, Star } from 'lucide-react';
+import { Download, User, Mail, Phone, Building, Globe, Linkedin, Instagram, Facebook, QrCode, ChevronDown } from 'lucide-react';
+
+// Add Poppins font
+if (typeof document !== 'undefined') {
+  const link = document.createElement('link');
+  link.href = 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap';
+  link.rel = 'stylesheet';
+  document.head.appendChild(link);
+}
 
 interface ContactFormData {
+  title: string;
   firstName: string;
   lastName: string;
-  email: string;
-  phone: string;
-  company?: string;
-  position?: string;
-  workEmail?: string;
-  workPhone?: string;
+  position: string;
+  company: string;
+  workEmail: string;
+  workPhone: string;
   website?: string;
   linkedin?: string;
   instagram?: string;
@@ -30,23 +37,17 @@ export default function Home() {
   const generateVCard = (data: ContactFormData): string => {
     let vcard = 'BEGIN:VCARD\n';
     vcard += 'VERSION:3.0\n';
-    vcard += `FN:${data.firstName} ${data.lastName}\n`;
+    
+    const fullName = data.title ? `${data.title} ${data.firstName} ${data.lastName}` : `${data.firstName} ${data.lastName}`;
+    vcard += `FN:${fullName}\n`;
     vcard += `N:${data.lastName};${data.firstName};;;\n`;
     
-    if (data.email) {
-      vcard += `EMAIL:${data.email}\n`;
-    }
-    
-    if (data.phone) {
-      vcard += `TEL:${data.phone}\n`;
+    if (data.position) {
+      vcard += `TITLE:${data.position}\n`;
     }
     
     if (data.company) {
       vcard += `ORG:${data.company}\n`;
-    }
-    
-    if (data.position) {
-      vcard += `TITLE:${data.position}\n`;
     }
     
     if (data.workEmail) {
@@ -58,7 +59,7 @@ export default function Home() {
     }
     
     if (data.website) {
-      vcard += `URL:${data.website}\n`;
+      vcard += `URL;TYPE=Website:${data.website}\n`;
     }
     
     if (data.linkedin) {
@@ -124,332 +125,310 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-green-50 to-emerald-100">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-white flex justify-center p-8" style={{fontFamily: 'Poppins, sans-serif'}}>
+      <div className="w-4/5 max-w-4xl bg-white rounded-xl shadow-lg p-8 text-center" style={{boxShadow: '0 8px 20px rgba(0, 0, 0, 0.08)'}}>
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center mb-6">
-            <div className="relative">
-              <QrCode className="w-16 h-16 text-emerald-600 mr-4" />
-              <Star className="w-6 h-6 text-green-400 absolute -top-2 -right-2" />
-            </div>
-            <div>
-              <h1 className="text-5xl font-bold text-gray-800 mb-2">Contact QR Generator</h1>
-              <div className="flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-green-500 mr-2" />
-                <span className="text-lg text-emerald-600 font-medium">Professional • Modern • Instant</span>
-                <Sparkles className="w-6 h-6 text-green-500 ml-2" />
+        <div className="mb-8">
+          <div className="logo mb-4">
+            <div className="w-30 h-30 mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto">
+                <span className="text-white font-bold text-2xl">TC</span>
               </div>
             </div>
           </div>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Transform your contact information into beautiful, scannable QR codes. 
-            <span className="text-emerald-600 font-semibold">Share your details instantly</span> with anyone, anywhere!
+          <h1 className="text-4xl font-bold mb-2" style={{
+            background: 'linear-gradient(45deg, #6a00f4, #ec008c)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+          }}>Contact TZ QR Generator</h1>
+          <p className="text-lg text-gray-600 mb-8">
+            Create a scannable QR code for your contact information
           </p>
         </div>
-
-        <div className="grid lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
-          {/* Form Section */}
-          <div className="bg-white rounded-3xl shadow-2xl p-8 border border-blue-100 shadow-blue-100/50">
-            <div className="flex items-center mb-8">
-              <div className="bg-gradient-to-r from-blue-100 to-green-100 p-3 rounded-full mr-4">
-                <User className="w-8 h-8 text-emerald-600" />
-              </div>
-              <div>
-                <h2 className="text-3xl font-bold text-gray-800">Contact Information</h2>
-                <p className="text-gray-500">Fill in your details below</p>
+        
+        <div className="mb-6">
+          <h3 className="text-xl font-semibold inline-block pb-2 mb-4" style={{
+            borderBottom: '2px solid #6a00f4',
+            marginBottom: '1rem'
+          }}>Personal Details</h3>
+        </div>
+        
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Title */}
+            <div className="space-y-2">
+              <label className="flex items-center text-sm font-medium text-gray-700">
+                <User className="w-4 h-4 mr-2 text-purple-600" />
+                Title
+              </label>
+              <div className="relative">
+                <select
+                  {...register('title')}
+                  className="w-full p-3 border border-gray-300 rounded-lg mt-2 mb-4 transition-colors duration-300 focus:border-purple-600 focus:outline-none bg-white"
+                >
+                  <option value="">Select</option>
+                  <option value="Mr.">Mr.</option>
+                  <option value="Ms.">Ms.</option>
+                  <option value="Mrs.">Mrs.</option>
+                  <option value="Dr.">Dr.</option>
+                  <option value="Prof.">Prof.</option>
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               </div>
             </div>
             
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-              {/* Personal Information */}
-              <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-2xl p-6 border border-blue-200">
-                <h3 className="text-xl font-semibold text-gray-700 mb-6 flex items-center">
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full mr-3"></div>
-                  Personal Details
-                </h3>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700">
-                      First Name *
-                    </label>
-                    <input
-                      {...register('firstName', { required: 'First name is required' })}
-                      className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 text-lg"
-                      placeholder="John"
-                    />
-                    {errors.firstName && (
-                      <p className="text-red-500 text-sm font-medium">{errors.firstName.message}</p>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700">
-                      Last Name *
-                    </label>
-                    <input
-                      {...register('lastName', { required: 'Last name is required' })}
-                      className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 text-lg"
-                      placeholder="Doe"
-                    />
-                    {errors.lastName && (
-                      <p className="text-red-500 text-sm font-medium">{errors.lastName.message}</p>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="grid md:grid-cols-2 gap-6 mt-6">
-                  <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700 flex items-center">
-                      <Mail className="w-4 h-4 mr-2 text-emerald-500" />
-                      Personal Email
-                    </label>
-                    <input
-                      {...register('email', {
-                        pattern: {
-                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                          message: 'Invalid email address'
-                        }
-                      })}
-                      type="email"
-                      className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 text-lg"
-                      placeholder="john@example.com"
-                    />
-                    {errors.email && (
-                      <p className="text-red-500 text-sm font-medium">{errors.email.message}</p>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700 flex items-center">
-                      <Phone className="w-4 h-4 mr-2 text-emerald-500" />
-                      Personal Phone
-                    </label>
-                    <input
-                      {...register('phone')}
-                      type="tel"
-                      className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 text-lg"
-                      placeholder="+1 (555) 123-4567"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Professional Information */}
-              <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-6 border border-green-200">
-                <h3 className="text-xl font-semibold text-gray-700 mb-6 flex items-center">
-                  <Building className="w-6 h-6 mr-3 text-green-600" />
-                  Professional Details
-                </h3>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700">
-                      Company
-                    </label>
-                    <input
-                      {...register('company')}
-                      className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 text-lg"
-                      placeholder="Acme Corporation"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700">
-                      Position
-                    </label>
-                    <input
-                      {...register('position')}
-                      className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 text-lg"
-                      placeholder="Software Engineer"
-                    />
-                  </div>
-                </div>
-                
-                <div className="grid md:grid-cols-2 gap-6 mt-6">
-                  <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700">
-                      Work Email
-                    </label>
-                    <input
-                      {...register('workEmail', {
-                        pattern: {
-                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                          message: 'Invalid email address'
-                        }
-                      })}
-                      type="email"
-                      className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 text-lg"
-                      placeholder="john@company.com"
-                    />
-                    {errors.workEmail && (
-                      <p className="text-red-500 text-sm font-medium">{errors.workEmail.message}</p>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700">
-                      Work Phone
-                    </label>
-                    <input
-                      {...register('workPhone')}
-                      type="tel"
-                      className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg"
-                      placeholder="+1 (555) 987-6543"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Online Presence */}
-              <div className="bg-gradient-to-r from-blue-50 to-emerald-50 rounded-2xl p-6 border border-blue-200">
-                <h3 className="text-xl font-semibold text-gray-700 mb-6 flex items-center">
-                  <Globe className="w-6 h-6 mr-3 text-blue-600" />
-                  Online Presence
-                </h3>
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700 flex items-center">
-                      <Globe className="w-4 h-4 mr-2 text-blue-500" />
-                      Website
-                    </label>
-                    <input
-                      {...register('website')}
-                      type="url"
-                      className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg"
-                      placeholder="https://www.example.com"
-                    />
-                  </div>
-                  
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <label className="block text-sm font-semibold text-gray-700 flex items-center">
-                        <Linkedin className="w-4 h-4 mr-2 text-blue-700" />
-                        LinkedIn
-                      </label>
-                      <input
-                        {...register('linkedin')}
-                        className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg"
-                        placeholder="linkedin.com/in/johndoe"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label className="block text-sm font-semibold text-gray-700 flex items-center">
-                        <Instagram className="w-4 h-4 mr-2 text-green-500" />
-                        Instagram
-                      </label>
-                      <input
-                        {...register('instagram')}
-                        className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 text-lg"
-                        placeholder="@johndoe"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label className="block text-sm font-semibold text-gray-700 flex items-center">
-                        <Facebook className="w-4 h-4 mr-2 text-blue-600" />
-                        Facebook
-                      </label>
-                      <input
-                        {...register('facebook')}
-                        className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg"
-                        placeholder="facebook.com/johndoe"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-4">
-                <button
-                  type="submit"
-                  className="flex-1 bg-gradient-to-r from-blue-600 to-emerald-600 text-white py-5 px-8 rounded-2xl font-bold text-lg hover:from-blue-700 hover:to-emerald-700 transform hover:scale-105 transition-all duration-200 shadow-xl flex items-center justify-center"
-                >
-                  <QrCode className="w-6 h-6 mr-3" />
-                  Generate QR Code
-                </button>
-                
-                <button
-                  type="button"
-                  onClick={clearForm}
-                  className="bg-gray-200 text-gray-700 py-5 px-8 rounded-2xl font-bold text-lg hover:bg-gray-300 transition-all duration-200 shadow-lg"
-                >
-                  Clear
-                </button>
-              </div>
-            </form>
+            {/* First Name */}
+            <div className="space-y-2">
+              <label className="flex items-center text-sm font-medium text-gray-700">
+                <User className="w-4 h-4 mr-2 text-purple-600" />
+                First Name
+              </label>
+              <input
+                {...register('firstName', { required: 'First name is required' })}
+                className="w-full p-3 border border-gray-300 rounded-lg mt-2 mb-4 transition-colors duration-300 focus:border-purple-600 focus:outline-none"
+                placeholder="First Name"
+              />
+              {errors.firstName && (
+                <p className="text-red-500 text-sm">{errors.firstName.message}</p>
+              )}
+            </div>
           </div>
-
-          {/* QR Code Preview */}
-          <div className="bg-white rounded-3xl shadow-2xl p-8 border border-green-100 shadow-green-100/50">
-            <div className="flex items-center mb-8">
-              <div className="bg-gradient-to-r from-green-100 to-blue-100 p-3 rounded-full mr-4">
-                <QrCode className="w-8 h-8 text-green-600" />
-              </div>
-              <div>
-                <h2 className="text-3xl font-bold text-gray-800">QR Code Preview</h2>
-                <p className="text-gray-500">Your scannable contact card</p>
-              </div>
-            </div>
-            
-            {showPreview && qrValue ? (
-              <div className="text-center">
-                <div className="bg-gradient-to-br from-blue-50 to-green-50 p-8 rounded-2xl shadow-inner mb-8 border-2 border-blue-200" ref={qrRef}>
-                  <QRCodeSVG
-                    value={qrValue}
-                    size={320}
-                    level="M"
-                    includeMargin={true}
-                    className="mx-auto drop-shadow-lg"
-                  />
-                </div>
-                
-                <button
-                  onClick={downloadQR}
-                  className="w-full bg-gradient-to-r from-emerald-500 to-green-500 text-white py-5 px-8 rounded-2xl font-bold text-lg hover:from-emerald-600 hover:to-green-600 transform hover:scale-105 transition-all duration-200 shadow-xl flex items-center justify-center mb-6"
-                >
-                  <Download className="w-6 h-6 mr-3" />
-                  Download QR Code
-                </button>
-                
-                <div className="bg-gradient-to-r from-blue-50 to-green-50 p-6 rounded-2xl border border-blue-200">
-                  <h3 className="text-lg font-semibold text-emerald-800 mb-2">📱 How to use:</h3>
-                  <p className="text-emerald-700 text-sm leading-relaxed">
-                    Scan this QR code with any smartphone camera or QR reader app to instantly save the contact information to your device!
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-20">
-                <div className="w-32 h-32 mx-auto mb-8 bg-gradient-to-br from-blue-100 to-green-100 rounded-full flex items-center justify-center">
-                  <QrCode size={64} className="text-emerald-500" />
-                </div>
-                <h3 className="text-2xl font-semibold text-gray-600 mb-4">Ready to Generate!</h3>
-                <p className="text-gray-500 text-lg leading-relaxed">
-                  Fill out the form and click <span className="font-semibold text-emerald-600">&quot;Generate QR Code&quot;</span> to create your personalized contact QR code
-                </p>
-              </div>
+          
+          <div className="space-y-2">
+            {/* Last Name */}
+            <label className="flex items-center text-sm font-medium text-gray-700">
+              <User className="w-4 h-4 mr-2 text-purple-600" />
+              Last Name
+            </label>
+            <input
+              {...register('lastName', { required: 'Last name is required' })}
+              className="w-full p-3 border border-gray-300 rounded-lg mt-2 mb-4 transition-colors duration-300 focus:border-purple-600 focus:outline-none"
+              placeholder="Doe"
+            />
+            {errors.lastName && (
+              <p className="text-red-500 text-sm">{errors.lastName.message}</p>
             )}
           </div>
-        </div>
-
-        {/* Footer */}
-        <footer className="mt-20 text-center text-gray-600 border-t border-gray-200 pt-12">
-          <div className="flex items-center justify-center mb-6">
-            <Sparkles className="w-6 h-6 text-green-500 mr-3" />
-            <p className="text-xl font-semibold">
-              Created with ❤️ by <span className="text-gray-800 font-bold">Santosh Baral</span>
-            </p>
-            <Sparkles className="w-6 h-6 text-green-500 ml-3" />
+          
+          {/* Professional Details */}
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold inline-block pb-2 mb-4" style={{
+              borderBottom: '2px solid #6a00f4',
+              marginBottom: '1rem'
+            }}>Professional Details</h3>
           </div>
-          <p className="text-lg">
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Position */}
+            <div className="space-y-2">
+              <label className="flex items-center text-sm font-medium text-gray-700">
+                <Building className="w-4 h-4 mr-2 text-purple-600" />
+                Position
+              </label>
+              <input
+                {...register('position')}
+                className="w-full p-3 border border-gray-300 rounded-lg mt-2 mb-4 transition-colors duration-300 focus:border-purple-600 focus:outline-none"
+                placeholder="Software Engineer"
+              />
+              {errors.position && (
+                <p className="text-red-500 text-xs mt-1">{errors.position.message}</p>
+              )}
+            </div>
+            
+            {/* Company */}
+            <div className="space-y-2">
+              <label className="flex items-center text-sm font-medium text-gray-700">
+                <Building className="w-4 h-4 mr-2 text-purple-600" />
+                Company
+              </label>
+              <input
+                 {...register('company')}
+                 className="w-full p-3 border border-gray-300 rounded-lg mt-2 mb-4 transition-colors duration-300 focus:border-purple-600 focus:outline-none"
+                 placeholder="Tech Company Inc."
+               />
+               {errors.company && (
+                 <p className="text-red-500 text-xs mt-1">{errors.company.message}</p>
+               )}
+            </div>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Work Email */}
+            <div className="space-y-2">
+              <label className="flex items-center text-sm font-medium text-gray-700">
+                <Mail className="w-4 h-4 mr-2 text-purple-600" />
+                Work Email
+              </label>
+              <input
+                {...register('workEmail', {
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: 'Invalid email address'
+                  }
+                })}
+                type="email"
+                className="w-full p-3 border border-gray-300 rounded-lg mt-2 mb-4 transition-colors duration-300 focus:border-purple-600 focus:outline-none"
+                placeholder="san@company.com"
+              />
+              {errors.workEmail && (
+                <p className="text-red-500 text-xs mt-1">{errors.workEmail.message}</p>
+              )}
+            </div>
+            
+            {/* Work Phone */}
+            <div className="space-y-2">
+              <label className="flex items-center text-sm font-medium text-gray-700">
+                <Phone className="w-4 h-4 mr-2 text-purple-600" />
+                Work Phone
+              </label>
+              <input
+                {...register('workPhone')}
+                type="tel"
+                className="w-full p-3 border border-gray-300 rounded-lg mt-2 mb-4 transition-colors duration-300 focus:border-purple-600 focus:outline-none"
+                placeholder="+977 (01) 123-4567"
+              />
+              {errors.workPhone && (
+                <p className="text-red-500 text-xs mt-1">{errors.workPhone.message}</p>
+              )}
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            {/* Website */}
+            <label className="flex items-center text-sm font-medium text-gray-700">
+              <Globe className="w-4 h-4 mr-2 text-purple-600" />
+              Website
+            </label>
+            <input
+               type="url"
+               {...register('website')}
+               className="w-full p-3 border border-gray-300 rounded-lg mt-2 mb-4 transition-colors duration-300 focus:border-purple-600 focus:outline-none"
+               placeholder="https://yourwebsite.com"
+             />
+          </div>
+          
+          {/* Online Presence */}
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold inline-block pb-2 mb-4" style={{
+              borderBottom: '2px solid #6a00f4',
+              marginBottom: '1rem'
+            }}>Social Network</h3>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* LinkedIn */}
+            <div className="space-y-2">
+              <label className="flex items-center text-sm font-medium text-gray-700">
+                <Linkedin className="w-4 h-4 mr-2 text-purple-600" />
+                LinkedIn
+              </label>
+              <input
+                {...register('linkedin')}
+                className="w-full p-3 border border-gray-300 rounded-lg mt-2 mb-4 transition-colors duration-300 focus:border-purple-600 focus:outline-none"
+                placeholder="https://linkedin.com/in/username"
+              />
+            </div>
+            
+            {/* Instagram */}
+            <div className="space-y-2">
+              <label className="flex items-center text-sm font-medium text-gray-700">
+                <Instagram className="w-4 h-4 mr-2 text-purple-600" />
+                Instagram
+              </label>
+              <input
+                {...register('instagram')}
+                className="w-full p-3 border border-gray-300 rounded-lg mt-2 mb-4 transition-colors duration-300 focus:border-purple-600 focus:outline-none"
+                placeholder="https://instagram.com/username"
+              />
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            {/* Facebook */}
+            <label className="flex items-center text-sm font-medium text-gray-700">
+              <Facebook className="w-4 h-4 mr-2 text-purple-600" />
+              Facebook
+            </label>
+            <input
+              {...register('facebook')}
+              className="w-full p-3 border border-gray-300 rounded-lg mt-2 mb-4 transition-colors duration-300 focus:border-purple-600 focus:outline-none"
+              placeholder="https://facebook.com/username"
+            />
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-4 mt-8 justify-center">
+            <button
+              type="submit"
+              className="text-white border-none py-3 px-6 rounded-lg cursor-pointer"
+              style={{
+                background: 'linear-gradient(45deg, #6a00f4, #ec008c)'
+              }}
+            >
+              Generate QR Code
+            </button>
+            
+            <button
+              type="button"
+              onClick={clearForm}
+              className="bg-transparent py-3 px-6 rounded-lg cursor-pointer"
+              style={{
+                border: '2px solid #6a00f4',
+                color: '#6a00f4'
+              }}
+            >
+              Clear
+            </button>
+          </div>
+        </form>
+        
+        {/* QR Code Preview */}
+        {showPreview && qrValue ? (
+          <div className="mt-8 p-8 rounded-lg text-center" style={{
+            border: '2px dashed #6a00f4'
+          }}>
+            <div className="mb-6" ref={qrRef}>
+              <QRCodeSVG
+                value={qrValue}
+                size={200}
+                level="M"
+                includeMargin={true}
+                className="mx-auto"
+              />
+            </div>
+            
+            <button
+              onClick={downloadQR}
+              className="text-white border-none py-3 px-6 rounded-lg cursor-pointer inline-flex items-center"
+              style={{
+                background: 'linear-gradient(45deg, #6a00f4, #ec008c)'
+              }}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Download QR Code
+            </button>
+          </div>
+        ) : (
+          <div className="mt-8 p-8 rounded-lg text-center" style={{
+            border: '2px dashed #6a00f4'
+          }}>
+            <p className="text-gray-500">Fill out the form and click "Generate QR Code" to see your QR code here</p>
+          </div>
+        )}
+        
+        {/* Footer */}
+        <footer className="mt-8 text-sm text-gray-500">
+          <p className="mb-2">
+            Created with ❤️ by TZ
+          </p>
+          <p>
             Powered by{' '}
             <a
               href="https://techzeninc.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-emerald-600 hover:text-emerald-800 font-semibold transition-colors duration-200 underline decoration-2 underline-offset-4"
+              className="text-purple-600 hover:text-purple-800"
             >
               Techzen Corporation Pvt. Ltd.
             </a>
